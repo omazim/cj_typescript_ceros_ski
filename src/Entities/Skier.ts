@@ -3,7 +3,7 @@
  * angles, and crashes into obstacles they run into. If caught by the rhino, the skier will get eaten and die.
  */
 
-import { IMAGE_NAMES, DIAGONAL_SPEED_REDUCER, KEYS } from "../Constants";
+import { IMAGE_NAMES, DIAGONAL_SPEED_REDUCER, KEYS, IMAGES } from "../Constants";
 import { Entity } from "./Entity";
 import { Canvas } from "../Core/Canvas";
 import { ImageManager } from "../Core/ImageManager";
@@ -24,7 +24,7 @@ enum STATES {
     STATE_SKIING = 'skiing',
     STATE_CRASHED = 'crashed',
     STATE_DEAD = 'dead',
-    // Cj: Added a new state for 'jumping'
+    // Added a new state for 'jumping'
     STATE_JUMPING = "jumping"
 };
 
@@ -76,6 +76,12 @@ export class Skier extends Entity {
     obstacleManager: ObstacleManager;
 
     /**
+     * @description There are five images included for jumping, hence five stages of the jump.
+     * @memberof Skier
+     */
+    readonly jumpStagesCount = 5;
+
+    /**
      * Init the skier.
      */
     constructor(x: number, y: number, imageManager: ImageManager, obstacleManager: ObstacleManager, canvas: Canvas) {
@@ -106,6 +112,13 @@ export class Skier extends Entity {
     }
 
     /**
+     * Is the skier jumping?
+     */
+    isJumping ():boolean {
+        return this.state === STATES.STATE_JUMPING;
+    }
+
+    /**
      * Set the current direction the skier is facing and update the image accordingly
      */
     setDirection(direction: number) {
@@ -121,10 +134,30 @@ export class Skier extends Entity {
     }
 
     /**
+     * @description Update the jumping image to reflect the jumping progress. There are 5 images for jumping, so we will progress from 1 through 5.
+     * @param progress 
+     */
+    setJumpingImage (progress:number):void {
+        
+        // Find the image that represents the passed progress.
+        console.log("jumping progress", progress);
+        const jumpImage = IMAGES.find(image => image.progress === progress);
+        
+        if (!jumpImage) return;
+
+        // Grab the name of that image.
+        const name = jumpImage.name;
+
+        this.imageName = name;
+    }
+
+    /**
      * Move the skier and check to see if they've hit an obstacle. The skier only moves in the skiing state.
      */
     update() {
-        if(this.isSkiing()) {
+        
+        if (this.isSkiing()) {
+            console.log("is skiing");
             this.move();
             this.checkIfHitObstacle();
         }
@@ -145,6 +178,7 @@ export class Skier extends Entity {
      * Move the skier based upon the direction they're currently facing. This handles frame update movement.
      */
     move() {
+        
         switch(this.direction) {
             case DIRECTION_LEFT_DOWN:
                 this.moveSkierLeftDown();
@@ -220,7 +254,7 @@ export class Skier extends Entity {
         }
 
         let handled: boolean = true;
-
+        console.log("handling key input:", inputKey, " length:", inputKey.length);
         switch(inputKey) {
             case KEYS.LEFT:
                 this.turnLeft();
@@ -233,6 +267,10 @@ export class Skier extends Entity {
                 break;
             case KEYS.DOWN:
                 this.turnDown();
+                break;
+            case KEYS.SPACE:
+                this.changeSkierState(STATES.STATE_JUMPING);
+                this.jump();
                 break;
             default:
                 handled = false;
@@ -299,7 +337,7 @@ export class Skier extends Entity {
         }
 
         this.setDirection(DIRECTION_DOWN);
-    }
+    }    
 
     /**
      * The skier has a bit different bounds calculating than a normal entity to make the collision with obstacles more
@@ -369,5 +407,44 @@ export class Skier extends Entity {
     die() {
         this.state = STATES.STATE_DEAD;
         this.speed = 0;
+    }
+
+    /**
+     * @description Changes the state of the skier in one call. If any extra work should be done for some state changes, we can handle that in this call too. 
+     * @param newState STATES
+     */
+    private changeSkierState (newState:STATES):void {
+        this.state = newState;
+    }
+
+    /**
+     * @description Cause the skier to jump ramp.
+     * @package {currentProgress} number
+     */
+    jump (currentProgress?:number):void {
+        // Todo: Skier cannot jump if they have crashed.
+        // if(this.isCrashed()) {
+        //     return;
+        // }
+
+        // Todo: Skier cannot jump if the current obstacle is a tree (per readme).
+        // const isATree = this.obstacleManager.getObstacles().find((obstacle:Obstacle) => {
+        //     return obstacle.imageName === IMAGE_NAMES.TREE || obstacle.imageName === IMAGE_NAMES.TREE_CLUSTER;
+        // });
+        // if (isATree) return;
+        
+        const progress = currentProgress || 0;
+        // Update the current image.
+        this.setJumpingImage(progress);
+
+        console.log("skier is jumping...stage", progress);        
+        // Ensure we stay within the jump stage count of 5.
+        if (progress + 1 === this.jumpStagesCount) {
+            console.log("resume skiing");
+            this.changeSkierState(STATES.STATE_SKIING);
+        } else {            
+            console.log("jumping stage...", progress);
+            setTimeout(() => this.jump(progress + 1), 200);
+        }
     }
 }
