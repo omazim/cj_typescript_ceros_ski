@@ -9,7 +9,7 @@ export enum KEYS {
     RIGHT = "ArrowRight",
     UP = "ArrowUp",
     DOWN = "ArrowDown",
-    SPACEBAR = "Space"// New key event code for jumping.
+    SPACE = "Space"// New key event code for jumping.
 };
 
 export enum IMAGE_NAMES {
