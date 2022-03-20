@@ -94,6 +94,10 @@ We are looking forward to see what you come up with!!
 
 All requirements and acceptance criteria were met.
 
+To run the app locally:
+  * `npm install`
+  * `npm run dev`
+
 * **Add a New Feature:**
 
   The skier can now jump. The applicable asset files included were used. 
