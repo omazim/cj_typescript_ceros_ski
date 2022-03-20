@@ -89,3 +89,26 @@ how creative candidates get with this.
 * Write unit tests for your code
 
 We are looking forward to see what you come up with!!
+
+**My Comments**
+
+All requirements and acceptance criteria were met.
+
+* **Add a New Feature:**
+
+  The skier can now jump. The applicable asset files included were used. 
+
+  Acceptance Criteria:
+  * Jump ramps are added to the game world and appear randomly as the skier skis.
+    * The jump ramp asset was added to the array of obstacles in the obstacles class.
+  * The skier should enter the jumping state when they hit the jump ramp.
+    * An exception for jump ramp was made in the `Skier.checkIfHitObstacle` method.
+  * The skier should also enter the jumping state when the user presses the spacebar.
+    * The space key was added to the Keys constant and also added as a switch case in the `Skier.handleInput` method.
+  * The skier should do a flip while jumping, at least one cycle through the jump images provided.
+    * There are five jump assets (each representing the jumping progress). All five were cycled through once by a recursive call from the `Skier.jump` method.
+  * While jumping, the skier should be able to jump over some obstacles: 
+    * Rocks can be jumped over
+      * An exception was added in the `Skier.checkIfHitObstacle` for the rock obstacles to allow skier jump over them (or crash if not in jumping state as at time of hitting the rock);
+    * Trees can NOT be jumped over
+      * No exception was made for trees, so skier would crash if the obstacle is a tree or tree cluster.
