@@ -37,8 +37,7 @@ it better! Your solution can only gain from having a better foundation.
 
 * **Add a New Feature:**
 
-  Add in the ability for the skier to jump. The asset files for the ramp and the jumping skier are included. All you 
-  need do is make them jump. 
+  Add in the ability for the skier to jump. The asset files for the ramp and the jumping skier are included. All you need do is make them jump. 
 
   Acceptance Criteria:
   * Jump ramps are added to the game world and appear randomly as the skier skis.

@@ -15,7 +15,9 @@ const OBSTACLE_TYPES: IMAGE_NAMES[] = [
     IMAGE_NAMES.TREE,
     IMAGE_NAMES.TREE_CLUSTER,
     IMAGE_NAMES.ROCK1,
-    IMAGE_NAMES.ROCK2
+    IMAGE_NAMES.ROCK2,
+    // Per readme, jump ramp should be present in the game so that skier can hit it to jump.
+    IMAGE_NAMES.JUMP_RAMP
 ];
 
 export class Obstacle extends Entity {

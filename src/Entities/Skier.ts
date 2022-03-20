@@ -135,12 +135,12 @@ export class Skier extends Entity {
 
     /**
      * @description Update the jumping image to reflect the jumping progress. There are 5 images for jumping, so we will progress from 1 through 5.
-     * @param progress 
+     * @param progress: number
      */
     setJumpingImage (progress:number):void {
         
         // Find the image that represents the passed progress.
-        console.log("jumping progress", progress);
+        // console.log("jumping progress", progress);
         const jumpImage = IMAGES.find(image => image.progress === progress);
         
         if (!jumpImage) return;
@@ -156,10 +156,12 @@ export class Skier extends Entity {
      */
     update() {
         
-        if (this.isSkiing()) {
-            console.log("is skiing");
+        // Added jumping state check here so that game scene can be updated while jumping as well.
+        if (this.isSkiing() || this.isJumping()) {
+            
             this.move();
             this.checkIfHitObstacle();
+            
         }
     }
 
@@ -375,10 +377,41 @@ export class Skier extends Entity {
 
             return intersectTwoRects(skierBounds, obstacleBounds);
         });
+        
+        // If there's no collision at all, no crash happens.
+        if (!collision) return;
 
-        if(collision) {
+        // This is the point where the skier crashes. Per readme, let's make exceptions for the jump ramp, such that hitting it would cause skier to jump (rather than crash).
+        // Let's also make an exception for rocks, 'hitting' it while jumping is allowed.
+        if (collision.imageName === IMAGE_NAMES.JUMP_RAMP) {
+            this.jumpIf();
+        } else if (collision.imageName === IMAGE_NAMES.ROCK1 || collision.imageName === IMAGE_NAMES.ROCK2) {
+            this.crashIf();
+        } else {
             this.crash();
         }
+    }
+
+    /**
+     * @description Per readme, skier should jump when skier hits a jump ramp.
+     * @returns boolean
+     */
+    private jumpIf ():void {
+
+        if (this.state !== STATES.STATE_JUMPING) {
+            
+            this.changeSkierState(STATES.STATE_JUMPING);
+            this.jump();
+        }
+    }
+
+    /**
+     * @description Per readme, skier can only jump over rocks, else skier should crash.
+     * @returns boolean
+     */
+    private crashIf ():void {
+
+        if (this.state !== STATES.STATE_JUMPING) this.crash();
     }
 
     /**
@@ -422,18 +455,13 @@ export class Skier extends Entity {
      * @package {currentProgress} number
      */
     jump (currentProgress?:number):void {
-        // Todo: Skier cannot jump if they have crashed.
-        // if(this.isCrashed()) {
-        //     return;
-        // }
-
-        // Todo: Skier cannot jump if the current obstacle is a tree (per readme).
-        // const isATree = this.obstacleManager.getObstacles().find((obstacle:Obstacle) => {
-        //     return obstacle.imageName === IMAGE_NAMES.TREE || obstacle.imageName === IMAGE_NAMES.TREE_CLUSTER;
-        // });
-        // if (isATree) return;
+        // Skier cannot jump if they have crashed. Just in case they are trying to jump by hitting the space key.
+        if(this.isCrashed()) {
+            return;
+        }
         
         const progress = currentProgress || 0;
+
         // Update the current image.
         this.setJumpingImage(progress);
 
