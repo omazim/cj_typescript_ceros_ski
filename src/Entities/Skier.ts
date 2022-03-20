@@ -256,7 +256,7 @@ export class Skier extends Entity {
         }
 
         let handled: boolean = true;
-        console.log("handling key input:", inputKey, " length:", inputKey.length);
+        // console.log("handling key input:", inputKey, " length:", inputKey.length);
         switch(inputKey) {
             case KEYS.LEFT:
                 this.turnLeft();
@@ -465,13 +465,13 @@ export class Skier extends Entity {
         // Update the current image.
         this.setJumpingImage(progress);
 
-        console.log("skier is jumping...stage", progress);        
+        // console.log("skier is jumping...stage", progress);        
         // Ensure we stay within the jump stage count of 5.
         if (progress + 1 === this.jumpStagesCount) {
-            console.log("resume skiing");
+            // console.log("resume skiing");
             this.changeSkierState(STATES.STATE_SKIING);
         } else {            
-            console.log("jumping stage...", progress);
+            // console.log("jumping stage...", progress);
             setTimeout(() => this.jump(progress + 1), 200);
         }
     }
